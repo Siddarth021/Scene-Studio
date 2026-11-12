@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Founder Studio &amp; Outreach Engine — SnapStudio</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="logo" href="/">
+        <span class="logo-badge">S</span>
+        <span id="navBrand">SnapStudio</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-pill" href="/">Public Storefront</a>
+        <a class="nav-pill active" href="/studio">Founder Studio &amp; CRM</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding-top:26px;padding-bottom:60px;">
+    <!-- Optional PIN Lock -->
+    <div id="pinGate" class="card" style="max-width:420px;margin:40px auto;display:none;">
+      <h2 style="margin:0 0 8px;">Enter Founder Studio PIN</h2>
+      <p class="small muted" style="margin:0 0 14px;">Your studio is protected before public launch.</p>
+      <form id="pinForm" class="input-row">
+        <input id="pinInput" type="password" placeholder="Studio PIN" required style="flex:1;" />
+        <button class="btn btn-primary" type="submit">Unlock</button>
+      </form>
+      <div id="pinError" class="status-banner error"></div>
+    </div>
+
+    <div id="studioApp" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+        <div>
+          <h1 style="margin:0;font-size:28px;text-align:left;">SnapStudio Founder Command Center</h1>
+          <p class="muted small" style="margin:4px 0 0;">Generate Before/After seller proof in 30s, send DMs, issue unlock credit codes, and guard your ₹1,300 API budget.</p>
+        </div>
+        <button id="refreshBtn" class="btn btn-secondary btn-sm">Refresh</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Revenue (INR)</div>
+          <div class="kpi-val" id="kpiInr">₹0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Revenue (USD)</div>
+          <div class="kpi-val" id="kpiUsd">$0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">API Spend / Cap</div>
+          <div class="kpi-val" id="kpiApi">₹0 / ₹1,300</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Outreach Today</div>
+          <div class="kpi-val" id="kpiToday">0 / 20</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Reply Rate</div>
+          <div class="kpi-val" id="kpiReply">0%</div>
+        </div>
+      </div>
+
+      <div class="tabs" id="studioTabs">
+        <button class="tab-btn active" data-tab="dm">1. Before/After DM &amp; WhatsApp Weapon</button>
+        <button class="tab-btn" data-tab="credits">2. Credit Codes &amp; Orders (<span id="creditCount">0</span>)</button>
+        <button class="tab-btn" data-tab="crm">3. Seller CRM (<span id="crmCount">0</span>)</button>
+        <button class="tab-btn" data-tab="settings">4. AI Keys, Payments &amp; Launch Kit</button>
+      </div>
+
+      <!-- TAB 1: BEFORE / AFTER DM WEAPON -->
+      <section id="pane-dm" class="studio-pane">
+        <div class="split-2">
+          <div class="card">
+            <h3 style="margin:0 0 12px;">Step A: Generate Free Seller Sample (Unwatermarked)</h3>
+            <form id="dmSampleForm">
+              <div class="dropzone" id="sDropzone">
+                <input id="sImageInput" type="file" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+                <div style="font-weight:700;">Upload Seller's Raw IG / Etsy / WhatsApp Photo</div>
+                <div class="small muted">Or leave blank to test with built-in demo item</div>
+                <img id="sThumb" class="thumb" style="display:none;" alt="Target preview" />
+              </div>
+
+              <div class="form-grid mt-12">
+                <div>
+                  <label class="field-label" for="sBiz">Seller / Brand Name</label>
+                  <input id="sBiz" type="text" placeholder="Zari Craft Studio" required />
+                </div>
+                <div>
+                  <label class="field-label" for="sProd">Product Name</label>
+                  <input id="sProd" type="text" placeholder="Kundan Choker Set" required />
+                </div>
+                <div>
+                  <label class="field-label" for="sHandle">Seller IG / WhatsApp / Email</label>
+                  <input id="sHandle" type="text" placeholder="@zaricraft or +91..." />
+                </div>
+                <div>
+                  <label class="field-label" for="sChannel">Channel</label>
+                  <select id="sChannel">
+                    <option value="Instagram DM">Instagram DM</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Etsy / Email">Etsy / Email</option>
+                    <option value="Reddit DM">Reddit DM</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="sMarket">Pricing Market</label>
+                  <select id="sMarket">
+                    <option value="india">India (₹299 / ₹2,499)</option>
+                    <option value="global">Global ($12 / $49)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="sPrice">Product Price Tag</label>
+                  <input id="sPrice" type="text" value="₹999" />
+                </div>
+                <div>
+                  <label class="field-label" for="sPreset">Studio / Try-On Preset</label>
+                  <select id="sPreset"></select>
+                </div>
+                <div>
+                  <label class="field-label" for="sEngine">AI Engine</label>
+                  <select id="sEngine">
+                    <option value="auto">Auto (Gemini → Fal → Local)</option>
+                    <option value="gemini">Google Gemini Free Tier</option>
+                    <option value="fal">Fal.ai (Bria / Flux Kontext)</option>
+                    <option value="local">Local Compositor (₹0 test)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-12">
+                <label class="field-label" for="sPrompt">Custom Prompt Note (Optional)</label>
+                <input id="sPrompt" type="text" placeholder="e.g. warm Diwali glow, velvet tray" />
+              </div>
+
+              <div class="input-row mt-16">
+                <button id="genSampleBtn" class="btn btn-primary" type="submit">Generate Sample + DM Scripts →</button>
+                <button id="saveSellerBtn" class="btn btn-dark" type="button" disabled>Save to CRM (Mark DM Sent) ✓</button>
+              </div>
+            </form>
+            <div id="dmStatus" class="status-banner"></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+              <h3 style="margin:0;">Step B: Attach Before/After Card &amp; Send DM</h3>
+              <a id="sShowcaseLink" href="#" target="_blank" class="btn btn-sm btn-secondary" style="display:none;">Open /showcase ↗</a>
+            </div>
+            <div id="dmEmpty" class="muted small">Upload a seller's product photo on the left to generate a crisp Before/After PNG card + hosted showcase link + personalized DM &amp; WhatsApp pitch.</div>
+            <div id="dmResults" style="display:none;">
+              <div class="asset-card" style="margin-bottom:14px;">
+                <img id="sBaImg" src="" alt="Before After Card" style="aspect-ratio:1400/760;" />
+                <div class="asset-meta">
+                  <strong class="small">Attach This PNG Directly in IG / WhatsApp DM!</strong>
+                  <a id="sBaDownload" href="#" download="before-after-sample.png" class="btn btn-sm btn-dark">Download PNG</a>
+                </div>
+              </div>
+
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <label class="field-label" style="margin:0;">Instagram / Etsy Cold DM</label>
+                  <button class="btn btn-sm btn-secondary copy-btn" data-target="txtIgDm" type="button">Copy</button>
+                </div>
+                <textarea id="txtIgDm" rows="5"></textarea>
+              </div>
+
+              <div class="mt-12">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <label class="field-label" style="margin:0;">WhatsApp Concierge Reply</label>
+                  <button class="btn btn-sm btn-secondary copy-btn" data-target="txtWa" type="button">Copy</button>
+                </div>
+                <textarea id="txtWa" rows="6"></textarea>
+              </div>
+
+              <div class="mt-12">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <label class="field-label" style="margin:0;">Cold Email</label>
+                  <button class="btn btn-sm btn-secondary copy-btn" data-target="txtEmail" type="button">Copy</button>
+                </div>
+                <textarea id="txtEmail" rows="6"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: CREDIT CODES & ORDERS -->
+      <section id="pane-credits" class="studio-pane" style="display:none;">
+        <div class="split-2">
+          <div class="card">
+            <h3 style="margin:0 0 12px;">Issue Buyer Credit Code (After UPI / Razorpay / Dodo Pay)</h3>
+            <form id="creditForm">
+              <div class="form-grid">
+                <div>
+                  <label class="field-label" for="cLabel">Pack Name</label>
+                  <input id="cLabel" type="text" value="20-Photo HD Pack" required />
+                </div>
+                <div>
+                  <label class="field-label" for="cTotal">Credits Included</label>
+                  <input id="cTotal" type="number" value="20" min="1" required />
+                </div>
+                <div>
+                  <label class="field-label" for="cMarket">Market</label>
+                  <select id="cMarket">
+                    <option value="india">India (₹ INR)</option>
+                    <option value="global">Global ($ USD)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="cPrice">Amount Paid</label>
+                  <input id="cPrice" type="number" value="299" min="0" required />
+                </div>
+              </div>
+              <div class="mt-12">
+                <label class="field-label" for="cCustom">Custom Code (Optional — auto-generates if blank)</label>
+                <input id="cCustom" type="text" placeholder="e.g. NOOR-20" />
+              </div>
+              <div class="mt-16">
+                <button class="btn btn-primary" type="submit">Generate &amp; Activate Code →</button>
+              </div>
+            </form>
+            <div id="creditStatus" class="status-banner"></div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin:0 0 12px;">Active &amp; Issued Pack Codes</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Pack</th>
+                    <th>Balance</th>
+                    <th>Paid</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="creditsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SELLER CRM -->
+      <section id="pane-crm" class="studio-pane" style="display:none;">
+        <div class="card">
+          <h3 style="margin:0 0 12px;">Seller Outreach &amp; Order Pipeline</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Seller / Product</th>
+                  <th>Channel / Handle</th>
+                  <th>Stage</th>
+                  <th>Deal Value</th>
+                  <th>Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crmTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: AI KEYS, PAYMENTS & LAUNCH KIT -->
+      <section id="pane-settings" class="studio-pane" style="display:none;">
+        <div class="split-2">
+          <div class="card">
+            <h3 style="margin:0 0 12px;">AI Image Engines, Payment Rails &amp; WhatsApp Bot</h3>
+            <form id="settingsForm">
+              <div class="form-grid">
+                <div>
+                  <label class="field-label" for="setBrand">Brand Name</label>
+                  <input id="setBrand" type="text" placeholder="SnapStudio" />
+                </div>
+                <div>
+                  <label class="field-label" for="setFounder">Your Name</label>
+                  <input id="setFounder" type="text" placeholder="Your Name" />
+                </div>
+                <div>
+                  <label class="field-label" for="setGemini">Gemini API Key (Free Tier — aistudio.google.com)</label>
+                  <input id="setGemini" type="text" placeholder="AIza..." />
+                </div>
+                <div>
+                  <label class="field-label" for="setFal">Fal.ai API Key (fal.ai — ₹1,300 budget)</label>
+                  <input id="setFal" type="text" placeholder="fal_..." />
+                </div>
+                <div>
+                  <label class="field-label" for="setEngine">Default Engine</label>
+                  <select id="setEngine">
+                    <option value="auto">Auto (Gemini → Fal → Local)</option>
+                    <option value="gemini">Gemini 2.5 Flash Image</option>
+                    <option value="fal">Fal.ai Bria / Flux Kontext</option>
+                    <option value="local">Local Studio Compositor (₹0)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="setPin">Studio Lock PIN (Set before deploy!)</label>
+                  <input id="setPin" type="text" placeholder="e.g. 4829" />
+                </div>
+                <div>
+                  <label class="field-label" for="setUpi">UPI ID (Auto-generates ₹299 QR)</label>
+                  <input id="setUpi" type="text" placeholder="yourname@okaxis" />
+                </div>
+                <div>
+                  <label class="field-label" for="setWa">WhatsApp Number (with country code)</label>
+                  <input id="setWa" type="text" placeholder="919876543210" />
+                </div>
+                <div>
+                  <label class="field-label" for="setRzp">Razorpay Payment Link (India)</label>
+                  <input id="setRzp" type="url" placeholder="https://rzp.io/l/..." />
+                </div>
+                <div>
+                  <label class="field-label" for="setDodo">Dodo Payments Link (Global USD)</label>
+                  <input id="setDodo" type="url" placeholder="https://checkout.dodopayments.com/..." />
+                </div>
+                <div>
+                  <label class="field-label" for="setPackInr">20-Pack India Price (₹)</label>
+                  <input id="setPackInr" type="number" value="299" />
+                </div>
+                <div>
+                  <label class="field-label" for="setPackUsd">20-Pack Global Price ($)</label>
+                  <input id="setPackUsd" type="number" value="12" />
+                </div>
+                <div>
+                  <label class="field-label" for="setDfyInr">DFY 50-Photo India Price (₹)</label>
+                  <input id="setDfyInr" type="number" value="2499" />
+                </div>
+                <div>
+                  <label class="field-label" for="setDfyUsd">DFY 50-Photo Global Price ($)</label>
+                  <input id="setDfyUsd" type="number" value="49" />
+                </div>
+              </div>
+
+              <div class="mt-16" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;">
+                <strong class="small">Optional: Meta WhatsApp Cloud API Webhook</strong>
+                <div class="small muted" style="margin:4px 0 8px;">Webhook URL: <code>https://YOUR-DOMAIN/api/whatsapp/webhook</code></div>
+                <div class="form-grid">
+                  <div>
+                    <label class="field-label" for="setWaVerify">Verify Token</label>
+                    <input id="setWaVerify" type="text" value="snapstudio_verify" />
+                  </div>
+                  <div>
+                    <label class="field-label" for="setWaPhoneId">Phone Number ID</label>
+                    <input id="setWaPhoneId" type="text" placeholder="1234567890" />
+                  </div>
+                  <div>
+                    <label class="field-label" for="setWaToken">WhatsApp Access Token</label>
+                    <input id="setWaToken" type="text" placeholder="EAAG..." />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-16">
+                <button class="btn btn-primary" type="submit">Save All Settings</button>
+              </div>
+              <div id="settingsStatus" class="status-banner"></div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 style="margin:0 0 12px;">Community Launch Posts (Reddit, Product Hunt, X)</h3>
+            <div id="launchList" style="display:grid;gap:14px;"></div>
+
+            <div class="mt-24" style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:14px;">
+              <h4 style="margin:0 0 6px;">₹2,000 Deployment &amp; First-Sale Checklist</h4>
+              <ol class="small" style="margin:0;padding-left:18px;color:#065f46;">
+                <li>Get a free <strong>Gemini API Key</strong> from <code>aistudio.google.com</code> (₹0 test tier) and paste it on the left.</li>
+                <li>Deploy free on <strong>Render</strong> (using included <code>render.yaml</code>) or <strong>Cloud Run</strong> (using <code>Dockerfile</code>), setting <code>STUDIO_PIN</code>.</li>
+                <li>Pick 20 Instagram/Etsy/Meesho sellers with phone-shot photos today → upload in Tab 1 → send their Before/After PNG + <code>/showcase/:id</code> link!</li>
+                <li>Reserve ₹700 for your domain right before posting to Reddit &amp; Product Hunt, and keep ₹1,300 strictly for Fal.ai top-ups as paying buyers roll in.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/studio.js"></script>
+</body>
+</html>

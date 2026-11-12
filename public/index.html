@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnapStudio — Turn Ugly Phone Photos Into Studio Shots &amp; Ad Packs</title>
+  <meta name="description" content="Upload 1 raw product photo and generate luxury studio scenes, virtual try-on model shots, and Instagram Story ad packs in 30 seconds." />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="logo" href="/">
+        <span class="logo-badge">S</span>
+        <span id="navBrand">SnapStudio</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-pill active" href="/">AI Product Studio</a>
+        <a class="nav-pill" href="/studio">Founder Studio &amp; DM Engine</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow">E-Commerce Scene Studio • AI Model Try-On • Seller Ad-Pack</div>
+      <h1>Turn Any Phone Photo Into Studio Shots &amp; Ready-to-Post Ads</h1>
+      <p class="lead">
+        Built for Instagram boutiques, Meesho, Amazon, Etsy &amp; D2C sellers. Upload 1 raw snapshot, pick a studio scene or AI model look, and download listing + Instagram Story ads in seconds.
+      </p>
+    </section>
+
+    <section class="card">
+      <form id="genForm">
+        <div class="split-2">
+          <!-- Left: Image Upload + Demo Samples + Credit Unlock -->
+          <div>
+            <label class="field-label">1. Upload Raw Product Photo (or Click a Demo Item)</label>
+            <div class="dropzone" id="dropzone">
+              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+              <div style="font-weight:700;">Click to Upload Phone Photo (JPG / PNG / WebP)</div>
+              <div class="small muted">Max 10 MB • Or try a built-in demo product below</div>
+              <img id="previewThumb" class="thumb" style="display:none;" alt="Uploaded product preview" />
+            </div>
+
+            <div class="input-row mt-12">
+              <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="serum" data-name="Saffron Glow Serum" data-price="₹699">Demo: Glow Serum</button>
+              <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="jewelry" data-name="Royal Kundan Choker" data-price="₹1,499">Demo: Kundan Jewelry</button>
+              <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="candle" data-name="Vanilla Soy Candle" data-price="₹499">Demo: Soy Candle</button>
+            </div>
+
+            <div class="mt-16">
+              <label class="field-label" for="creditCodeInput">Have a Pack Credit Code? (Optional — Unlocks Unwatermarked HD)</label>
+              <div class="input-row">
+                <input id="creditCodeInput" type="text" placeholder="e.g. SNAP-A8F2-20" style="flex:1;" />
+                <button type="button" id="checkCreditBtn" class="btn btn-secondary">Verify Code</button>
+              </div>
+              <div id="creditMsg" class="small muted mt-12"></div>
+            </div>
+          </div>
+
+          <!-- Right: Workflow Mode + Preset + Seller Ad-Pack Details -->
+          <div>
+            <label class="field-label">2. Choose Workflow &amp; Style Preset</label>
+            <div class="tabs" id="modeTabs">
+              <button type="button" class="tab-btn active" data-mode="scene">Workflow A: Studio Scenes</button>
+              <button type="button" class="tab-btn" data-mode="tryon">Workflow B: AI Model / Try-On</button>
+            </div>
+
+            <div id="presetGrid" class="preset-grid"></div>
+
+            <div class="form-grid mt-16">
+              <div>
+                <label class="field-label" for="brandInput">Brand Name (For Ad Pack)</label>
+                <input id="brandInput" type="text" placeholder="Noor Essentials" />
+              </div>
+              <div>
+                <label class="field-label" for="productInput">Product Title</label>
+                <input id="productInput" type="text" placeholder="Saffron Glow Serum" />
+              </div>
+              <div>
+                <label class="field-label" for="priceInput">Price Tag</label>
+                <input id="priceInput" type="text" value="₹499" placeholder="₹499 or $24" />
+              </div>
+              <div>
+                <label class="field-label" for="badgeInput">Offer Ribbon</label>
+                <input id="badgeInput" type="text" value="20% OFF" placeholder="20% OFF" />
+              </div>
+            </div>
+
+            <div class="form-grid mt-12">
+              <div>
+                <label class="field-label" for="ctaInput">Ad CTA Line</label>
+                <input id="ctaInput" type="text" value="DM TO ORDER ON WHATSAPP" />
+              </div>
+              <div>
+                <label class="field-label" for="promptInput">Custom Styling Note (Optional)</label>
+                <input id="promptInput" type="text" placeholder="e.g. add rose petals, warm evening light" />
+              </div>
+            </div>
+
+            <div class="mt-16" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <button id="generateBtn" class="btn btn-primary" type="submit" style="flex:1 1 240px;">Generate Studio + Ad Pack →</button>
+              <span id="engineBadge" class="badge badge-neutral">Engine: Checking...</span>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div id="genStatus" class="status-banner"></div>
+    </section>
+
+    <section id="resultContainer"></section>
+  </main>
+
+  <script src="/renderShowcase.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

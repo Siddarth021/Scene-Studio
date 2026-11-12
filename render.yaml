@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: snapstudio-ai
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: STUDIO_PIN
+        value: "4829"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: FAL_KEY
+        sync: false
