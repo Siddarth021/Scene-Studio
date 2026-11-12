@@ -56,11 +56,23 @@
         document.getElementById('navBrand').textContent = publicOffer.brandName;
       }
       const eng = publicOffer?.engines || {};
-      const activeEngine = eng.geminiReady
-        ? 'Gemini 2.5 Flash Image Ready'
-        : eng.falReady
-        ? 'Fal.ai Product Shot Ready'
-        : 'Local Studio Compositor (Add API key in /studio for AI)';
+      const pref = eng.defaultEngine || 'auto';
+      let activeEngine = 'Local Studio Compositor (Add API key in /studio for AI)';
+      if (pref === 'fal' && eng.falReady) {
+        activeEngine = 'Fal.ai Product Shot Ready';
+      } else if (pref === 'huggingface' && eng.hfReady) {
+        activeEngine = 'HuggingFace Free Cutout Ready';
+      } else if (pref === 'gemini' && eng.geminiReady) {
+        activeEngine = 'Gemini 2.5 Flash Image Ready';
+      } else if (pref === 'local') {
+        activeEngine = 'Local Studio Compositor (₹0)';
+      } else if (eng.geminiReady) {
+        activeEngine = 'Gemini 2.5 Flash Image Ready';
+      } else if (eng.falReady) {
+        activeEngine = 'Fal.ai Product Shot Ready';
+      } else if (eng.hfReady) {
+        activeEngine = 'HuggingFace Free Cutout Ready';
+      }
       document.getElementById('engineBadge').textContent = activeEngine;
       renderPresets();
     } catch {
