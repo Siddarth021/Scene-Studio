@@ -72,7 +72,6 @@
                 <span class="badge badge-neutral">Engine: ${esc(showcase.engineUsed)}</span>
               </div>
               <h2 style="margin:0;font-size:24px;">${esc(showcase.businessName)} — ${esc(showcase.productName)}</h2>
-              ${showcase.apiWarning ? `<div class="small muted mt-12">Note: ${esc(showcase.apiWarning)}</div>` : ''}
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn btn-dark btn-sm" id="ss-copy-link">Copy Showcase Link</button>
@@ -192,3 +191,4 @@
 
   global.SnapStudioView = { renderShowcase, esc };
 })(window);
+

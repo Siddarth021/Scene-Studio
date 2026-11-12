@@ -178,6 +178,12 @@ async function executeStudioPipeline({
 }
 
 // Page routes
+app.get('/favicon.ico', (req, res) => {
+  res.type('image/svg+xml').send(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0f766e"/><text x="16" y="22" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#fff" text-anchor="middle">S</text></svg>'
+  );
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -516,3 +522,4 @@ app.listen(PORT, () => {
   console.log(`   • Public Storefront: http://localhost:${PORT}/`);
   console.log(`   • Founder Studio & Outreach Engine: http://localhost:${PORT}/studio\n`);
 });
+

@@ -287,7 +287,11 @@
     sessionStorage.setItem('ss_studio_pin', studioPin);
     try {
       await bootstrap();
-      showStatus(pinError, '', '');
+      if (studioApp.style.display === 'none') {
+        showStatus(pinError, 'error', 'Incorrect Studio PIN. Check STUDIO_PIN in Render Environment Variables (default: 4829).');
+      } else {
+        showStatus(pinError, '', '');
+      }
     } catch {
       showStatus(pinError, 'error', 'Incorrect Studio PIN.');
     }
@@ -467,3 +471,4 @@
 
   bootstrap();
 })();
+
