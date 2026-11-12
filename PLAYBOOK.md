@@ -25,3 +25,4 @@
 1. Ensure `STUDIO_PIN` and your Gemini/Fal keys + payment links are saved.
 2. Post the pre-written templates from **`/studio` → Tab 4** to `r/EtsySellers`, `r/smallbusiness`, `r/SideProject`, Indie Hackers, and Product Hunt.
 3. Visitors test free watermarked previews on `/` and upgrade to 20 unwatermarked HD credits via your UPI QR / Dodo checkout.
+

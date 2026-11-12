@@ -3,6 +3,7 @@
   let state = { stats: {}, showcases: [], credits: [], prospects: [], settings: {}, launchTemplates: [] };
   let presets = [];
   let sSelectedFile = null;
+  let sAfterFile = null;
   let lastShowcase = null;
   let lastShowcaseUrl = '';
 
@@ -215,6 +216,7 @@
     document.getElementById('setFounder').value = s.founderName || '';
     document.getElementById('setGemini').value = s.geminiApiKey || '';
     document.getElementById('setFal').value = s.falApiKey || '';
+    document.getElementById('setHf').value = s.hfApiKey || '';
     document.getElementById('setEngine').value = s.defaultEngine || 'auto';
     document.getElementById('setPin').value = s.studioPin || '';
     document.getElementById('setUpi').value = s.upiId || '';
@@ -324,6 +326,32 @@
     reader.readAsDataURL(file);
   });
 
+  const sAfterDropzone = document.getElementById('sAfterDropzone');
+  const sAfterInput = document.getElementById('sAfterInput');
+  const sAfterThumb = document.getElementById('sAfterThumb');
+  sAfterDropzone.addEventListener('click', () => sAfterInput.click());
+  sAfterInput.addEventListener('change', () => {
+    const file = sAfterInput.files?.[0];
+    if (!file) return;
+    sAfterFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      sAfterThumb.src = reader.result;
+      sAfterThumb.style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('copyPromptBtn').addEventListener('click', (e) => {
+    const chosenId = document.getElementById('sPreset').value;
+    const presetObj = presets.find((p) => p.id === chosenId) || presets[0];
+    const customNote = document.getElementById('sPrompt').value.trim();
+    const promptText = presetObj
+      ? `${presetObj.prompt}${customNote ? ' ' + customNote : ''}`
+      : 'Place this exact product on a clean luxury studio countertop with soft sunlight and natural shadows.';
+    copyValue(promptText, e.target);
+  });
+
   document.getElementById('dmSampleForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const dmStatus = document.getElementById('dmStatus');
@@ -334,6 +362,7 @@
       const fd = new FormData();
       if (sSelectedFile) fd.append('image', sSelectedFile);
       else fd.append('demoSample', 'jewelry');
+      if (sAfterFile) fd.append('afterImage', sAfterFile);
       fd.append('businessName', document.getElementById('sBiz').value.trim());
       fd.append('productName', document.getElementById('sProd').value.trim());
       fd.append('sellerHandle', document.getElementById('sHandle').value.trim());
@@ -441,6 +470,7 @@
           founderName: document.getElementById('setFounder').value.trim(),
           geminiApiKey: document.getElementById('setGemini').value.trim(),
           falApiKey: document.getElementById('setFal').value.trim(),
+          hfApiKey: document.getElementById('setHf').value.trim(),
           defaultEngine: document.getElementById('setEngine').value,
           studioPin: document.getElementById('setPin').value.trim(),
           upiId: document.getElementById('setUpi').value.trim(),

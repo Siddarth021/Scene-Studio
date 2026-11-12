@@ -79,9 +79,16 @@
             <form id="dmSampleForm">
               <div class="dropzone" id="sDropzone">
                 <input id="sImageInput" type="file" accept="image/png,image/jpeg,image/webp" style="display:none;" />
-                <div style="font-weight:700;">Upload Seller's Raw IG / Etsy / WhatsApp Photo</div>
+                <div style="font-weight:700;">1. Upload Seller's Raw IG / Etsy / WhatsApp Photo</div>
                 <div class="small muted">Or leave blank to test with built-in demo item</div>
                 <img id="sThumb" class="thumb" style="display:none;" alt="Target preview" />
+              </div>
+
+              <div class="dropzone mt-12" id="sAfterDropzone" style="padding:12px;">
+                <input id="sAfterInput" type="file" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+                <div style="font-weight:700;font-size:13px;">2. (₹0 Free Mode) Optional: Upload Free AI "After" Photo</div>
+                <div class="small muted">Generate free in <strong>gemini.google.com</strong> or <strong>fal.ai playground</strong>, drop result here → auto-builds all Story Ads &amp; Before/After Showcase!</div>
+                <img id="sAfterThumb" class="thumb" style="display:none;" alt="After preview" />
               </div>
 
               <div class="form-grid mt-12">
@@ -124,16 +131,20 @@
                 <div>
                   <label class="field-label" for="sEngine">AI Engine</label>
                   <select id="sEngine">
-                    <option value="auto">Auto (Gemini → Fal → Local)</option>
-                    <option value="gemini">Google Gemini Free Tier</option>
-                    <option value="fal">Fal.ai (Bria / Flux Kontext)</option>
-                    <option value="local">Local Compositor (₹0 test)</option>
+                    <option value="auto">Auto (Gemini → Fal → HF → Local)</option>
+                    <option value="gemini">Google Gemini API</option>
+                    <option value="fal">Fal.ai (Starter Credits / Paid)</option>
+                    <option value="huggingface">HuggingFace Free Cutout (₹0)</option>
+                    <option value="local">Local Compositor (₹0)</option>
                   </select>
                 </div>
               </div>
 
               <div class="mt-12">
-                <label class="field-label" for="sPrompt">Custom Prompt Note (Optional)</label>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;">
+                  <label class="field-label" for="sPrompt" style="margin:0;">Custom Prompt Note (Optional)</label>
+                  <button id="copyPromptBtn" class="btn btn-sm btn-secondary" type="button">Copy Free Gemini Web Prompt</button>
+                </div>
                 <input id="sPrompt" type="text" placeholder="e.g. warm Diwali glow, velvet tray" />
               </div>
 
@@ -288,15 +299,20 @@
                   <input id="setGemini" type="text" placeholder="AIza..." />
                 </div>
                 <div>
-                  <label class="field-label" for="setFal">Fal.ai API Key (fal.ai — ₹1,300 budget)</label>
+                  <label class="field-label" for="setFal">Fal.ai API Key (Free starter credits at fal.ai)</label>
                   <input id="setFal" type="text" placeholder="fal_..." />
+                </div>
+                <div>
+                  <label class="field-label" for="setHf">HuggingFace Token (₹0 Cutouts, no card — hf.co)</label>
+                  <input id="setHf" type="text" placeholder="hf_..." />
                 </div>
                 <div>
                   <label class="field-label" for="setEngine">Default Engine</label>
                   <select id="setEngine">
-                    <option value="auto">Auto (Gemini → Fal → Local)</option>
+                    <option value="auto">Auto (Gemini → Fal → HF → Local)</option>
                     <option value="gemini">Gemini 2.5 Flash Image</option>
                     <option value="fal">Fal.ai Bria / Flux Kontext</option>
+                    <option value="huggingface">HuggingFace Free Cutout (₹0)</option>
                     <option value="local">Local Studio Compositor (₹0)</option>
                   </select>
                 </div>
@@ -386,3 +402,4 @@
   <script src="/studio.js"></script>
 </body>
 </html>
+

@@ -27,6 +27,16 @@ async function runTests() {
   assert.strictEqual(freeMeta.height, 1024);
   assert.strictEqual(freeRender.engineUsed, 'local-studio-compositor');
 
+  // Test ₹0 free custom AI "After" upload path
+  const afterRender = await generateStudioImage({
+    inputBuffer: rawBuf,
+    afterBuffer: rawBuf,
+    preset,
+    watermarked: false
+  });
+  assert.strictEqual(afterRender.engineUsed, 'free-ai-web-upload');
+  assert.strictEqual(afterRender.estimatedCostInr, 0);
+
   console.log('2. Testing Seller Ad-Pack compositor (1:1 Feed, 9:16 Story, White Listing, Before/After)...');
   const pack = await renderAdPack({
     rawBuffer: rawBuf,
@@ -168,3 +178,4 @@ runTests().catch((err) => {
   console.error('❌ Test failed:', err);
   process.exit(1);
 });
+

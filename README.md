@@ -37,3 +37,4 @@ npx cloudflared tunnel --url http://localhost:3000
 A production `Dockerfile` is included on port `8080`. Authenticate with `gcloud auth login` and deploy directly from `d:\B2C`.
 
 See [PLAYBOOK.md](./PLAYBOOK.md) for the ₹2,000 budget plan and 7-day customer acquisition playbook, and [IDEAS_BACKLOG.md](./IDEAS_BACKLOG.md) for your saved later ventures (`CODGuard`, `ClauseGuard`, `BuyerRadar`, `SlotSaver`, `HookDeck`).
+

@@ -89,6 +89,7 @@ async function buildOfferPayload(settings, baseUrl, note = 'SnapStudio 20-Photo 
     engines: {
       geminiReady: Boolean(settings.geminiApiKey),
       falReady: Boolean(settings.falApiKey),
+      hfReady: Boolean(settings.hfApiKey),
       localReady: true
     }
   };
@@ -96,6 +97,7 @@ async function buildOfferPayload(settings, baseUrl, note = 'SnapStudio 20-Photo 
 
 async function executeStudioPipeline({
   rawBuffer,
+  afterBuffer = null,
   presetId,
   customPrompt = '',
   enginePreference = 'auto',
@@ -117,6 +119,7 @@ async function executeStudioPipeline({
 
   const gen = await generateStudioImage({
     inputBuffer: rawBuffer,
+    afterBuffer,
     preset,
     customPrompt,
     enginePreference,
@@ -214,6 +217,7 @@ app.get('/api/health', (req, res) => {
     engines: {
       gemini: Boolean(s.geminiApiKey),
       fal: Boolean(s.falApiKey),
+      hf: Boolean(s.hfApiKey),
       local: true
     }
   });
@@ -407,6 +411,7 @@ app.get('/api/studio/bootstrap', requireStudioAuth, (req, res) => {
     ...settings,
     geminiApiKey: settings.geminiApiKey ? '••••' + settings.geminiApiKey.slice(-4) : '',
     falApiKey: settings.falApiKey ? '••••' + settings.falApiKey.slice(-4) : '',
+    hfApiKey: settings.hfApiKey ? '••••' + settings.hfApiKey.slice(-4) : '',
     whatsappAccessToken: settings.whatsappAccessToken ? '••••' : '',
     studioPin: settings.studioPin ? '••••' : ''
   };
@@ -421,13 +426,20 @@ app.get('/api/studio/bootstrap', requireStudioAuth, (req, res) => {
 });
 
 app.post('/api/studio/generate-sample', requireStudioAuth, (req, res) => {
-  upload.single('image')(req, res, async (uploadErr) => {
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'afterImage', maxCount: 1 }
+  ])(req, res, async (uploadErr) => {
     if (uploadErr) return res.status(400).json({ error: uploadErr.message });
     try {
       const body = req.body || {};
-      const rawBuffer = req.file?.buffer || (await createDemoProductBuffer(body.demoSample || 'jewelry'));
+      const rawFileObj = req.files?.image?.[0];
+      const afterFileObj = req.files?.afterImage?.[0];
+      const rawBuffer = rawFileObj?.buffer || (await createDemoProductBuffer(body.demoSample || 'jewelry'));
+      const afterBuffer = afterFileObj?.buffer || null;
       const showcase = await executeStudioPipeline({
         rawBuffer,
+        afterBuffer,
         presetId: body.presetId || 'marble_luxury',
         customPrompt: body.customPrompt || '',
         enginePreference: body.engine || 'auto',
@@ -500,7 +512,7 @@ app.delete('/api/studio/prospects/:id', requireStudioAuth, (req, res) => {
 
 app.put('/api/studio/settings', requireStudioAuth, (req, res) => {
   const patch = { ...(req.body || {}) };
-  for (const secretField of ['geminiApiKey', 'falApiKey', 'whatsappAccessToken', 'studioPin']) {
+  for (const secretField of ['geminiApiKey', 'falApiKey', 'hfApiKey', 'whatsappAccessToken', 'studioPin']) {
     if (typeof patch[secretField] === 'string' && patch[secretField].startsWith('••••')) {
       delete patch[secretField];
     }
@@ -511,6 +523,7 @@ app.put('/api/studio/settings', requireStudioAuth, (req, res) => {
       ...saved,
       geminiApiKey: saved.geminiApiKey ? '••••' + saved.geminiApiKey.slice(-4) : '',
       falApiKey: saved.falApiKey ? '••••' + saved.falApiKey.slice(-4) : '',
+      hfApiKey: saved.hfApiKey ? '••••' + saved.hfApiKey.slice(-4) : '',
       whatsappAccessToken: saved.whatsappAccessToken ? '••••' : '',
       studioPin: saved.studioPin ? '••••' : ''
     }

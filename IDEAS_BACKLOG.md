@@ -30,3 +30,4 @@
 ### Later #5: **HookDeck** (Voice Note / Link → Branded Instagram Carousels & Reel Scripts)
 - **Target:** Coaches, realtors, creators, D2C founders.
 - **Offer:** Automated 7-slide PNG carousels + 30s teleprompter scripts. `₹499–₹999` / `\$15/mo`.
+

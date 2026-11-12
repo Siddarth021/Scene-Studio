@@ -19,6 +19,7 @@ const DEFAULT_SETTINGS = {
   dfyGlobalPrice: 49,
   geminiApiKey: '',
   falApiKey: '',
+  hfApiKey: '',
   defaultEngine: 'auto',
   apiBudgetInr: 1300,
   whatsappVerifyToken: 'snapstudio_verify',
@@ -95,6 +96,7 @@ function getSettings() {
     ...s,
     geminiApiKey: s.geminiApiKey || (process.env.GEMINI_API_KEY || '').trim(),
     falApiKey: s.falApiKey || (process.env.FAL_KEY || '').trim(),
+    hfApiKey: s.hfApiKey || (process.env.HF_TOKEN || '').trim(),
     whatsappVerifyToken: (process.env.WHATSAPP_VERIFY_TOKEN || '').trim() || s.whatsappVerifyToken || 'snapstudio_verify',
     whatsappPhoneNumberId: (process.env.WHATSAPP_PHONE_NUMBER_ID || '').trim() || s.whatsappPhoneNumberId,
     whatsappAccessToken: (process.env.WHATSAPP_ACCESS_TOKEN || '').trim() || s.whatsappAccessToken

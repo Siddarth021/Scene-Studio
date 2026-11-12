@@ -124,7 +124,35 @@ async function generateWithFal({ normBuffer, prompt, mode, apiKey }) {
   return Buffer.from(await imgRes.arrayBuffer());
 }
 
-async function renderLocalStudioComposite({ normBuffer, preset }) {
+async function generateWithHuggingFaceCutout({ normBuffer, preset, apiKey }) {
+  const endpoint = 'https://router.huggingface.co/hf-inference/models/briaai/RMBG-1.4';
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 35000);
+  let res;
+  try {
+    res = await fetch(endpoint, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'image/png'
+      },
+      body: normBuffer
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+
+  const ctype = (res.headers.get('content-type') || '').toLowerCase();
+  if (!res.ok || !ctype.startsWith('image/')) {
+    const msg = await res.text().catch(() => '');
+    throw new Error(msg ? msg.slice(0, 140) : `HuggingFace returned ${res.status}`);
+  }
+  const cutoutBuffer = Buffer.from(await res.arrayBuffer());
+  return renderLocalStudioComposite({ normBuffer: cutoutBuffer, preset, isCutout: true });
+}
+
+async function renderLocalStudioComposite({ normBuffer, preset, isCutout = false }) {
   const size = 1024;
   const prod = await sharp(normBuffer)
     .resize(620, 620, { fit: 'inside', withoutEnlargement: false })
@@ -157,15 +185,20 @@ async function renderLocalStudioComposite({ normBuffer, preset }) {
     <rect x="${Math.round(size * 0.14)}" y="${top + ph + 12}" width="${Math.round(size * 0.72)}" height="18" rx="9" fill="${podiumColor}" opacity="${isDark ? '0.25' : '0.7'}"/>
   </svg>`;
 
-  // Round product frame subtly for clean studio placement
-  const maskSvg = `<svg width="${pw}" height="${ph}" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="${pw}" height="${ph}" rx="28" ry="28" fill="#ffffff"/>
-  </svg>`;
-  const framedProduct = await sharp(prod)
-    .ensureAlpha()
-    .composite([{ input: Buffer.from(maskSvg), blend: 'dest-in' }])
-    .png()
-    .toBuffer();
+  let framedProduct;
+  if (isCutout) {
+    framedProduct = await sharp(prod).ensureAlpha().png().toBuffer();
+  } else {
+    // Round product frame subtly for clean studio placement
+    const maskSvg = `<svg width="${pw}" height="${ph}" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="${pw}" height="${ph}" rx="28" ry="28" fill="#ffffff"/>
+    </svg>`;
+    framedProduct = await sharp(prod)
+      .ensureAlpha()
+      .composite([{ input: Buffer.from(maskSvg), blend: 'dest-in' }])
+      .png()
+      .toBuffer();
+  }
 
   return sharp(Buffer.from(bgSvg))
     .composite([{ input: framedProduct, left, top }])
@@ -175,22 +208,40 @@ async function renderLocalStudioComposite({ normBuffer, preset }) {
 
 async function generateStudioImage({
   inputBuffer,
+  afterBuffer = null,
   preset,
   customPrompt = '',
   enginePreference = 'auto',
   settings = {},
   watermarked = false
 }) {
+  if (afterBuffer) {
+    let customFinal = await sharp(afterBuffer)
+      .rotate()
+      .resize(1024, 1024, { fit: 'cover' })
+      .png()
+      .toBuffer();
+    if (watermarked) customFinal = await applyWatermark(customFinal);
+    return {
+      buffer: customFinal,
+      engineUsed: 'free-ai-web-upload',
+      estimatedCostInr: 0,
+      apiWarning: ''
+    };
+  }
+
   const normBuffer = await normalizeInputPng(inputBuffer);
   const fullPrompt = customPrompt ? `${preset.prompt} Additional styling note: ${customPrompt}` : preset.prompt;
 
   const geminiKey = settings.geminiApiKey || '';
   const falKey = settings.falApiKey || '';
+  const hfKey = settings.hfApiKey || '';
 
   let chosen = enginePreference || settings.defaultEngine || 'auto';
   if (chosen === 'auto') {
     if (geminiKey) chosen = 'gemini';
     else if (falKey) chosen = 'fal';
+    else if (hfKey) chosen = 'huggingface';
     else chosen = 'local';
   }
 
@@ -201,31 +252,47 @@ async function generateStudioImage({
 
   if (chosen === 'gemini') {
     if (!geminiKey) {
-      apiWarning = 'No Gemini API key configured; rendered with Local Studio Compositor.';
-      chosen = 'local';
+      apiWarning = 'No Gemini API key configured; falling back.';
+      chosen = falKey ? 'fal' : hfKey ? 'huggingface' : 'local';
     } else {
       try {
         outputBuffer = await generateWithGemini({ normBuffer, prompt: fullPrompt, apiKey: geminiKey });
         engineUsed = 'gemini-2.5-flash-image';
-        estimatedCostInr = 0; // Free tier / ~₹3 paid
+        estimatedCostInr = 0;
       } catch (err) {
-        apiWarning = `Gemini fallback (${err.message}); used ${falKey ? 'Fal.ai' : 'Local Studio Compositor'}.`;
-        chosen = falKey ? 'fal' : 'local';
+        chosen = falKey ? 'fal' : hfKey ? 'huggingface' : 'local';
+        apiWarning = `Gemini fallback (${err.message}); used ${chosen}.`;
       }
     }
   }
 
   if (chosen === 'fal' && !outputBuffer) {
     if (!falKey) {
-      apiWarning = 'No Fal.ai API key configured; rendered with Local Studio Compositor.';
-      chosen = 'local';
+      apiWarning = 'No Fal.ai API key configured; falling back.';
+      chosen = hfKey ? 'huggingface' : 'local';
     } else {
       try {
         outputBuffer = await generateWithFal({ normBuffer, prompt: fullPrompt, mode: preset.mode, apiKey: falKey });
         engineUsed = preset.mode === 'tryon' ? 'fal-flux-pro-kontext' : 'fal-bria-product-shot';
         estimatedCostInr = 3.5;
       } catch (err) {
-        apiWarning = `Fal.ai fallback (${err.message}); used Local Studio Compositor.`;
+        chosen = hfKey ? 'huggingface' : 'local';
+        apiWarning = `Fal.ai fallback (${err.message}); used ${chosen}.`;
+      }
+    }
+  }
+
+  if (chosen === 'huggingface' && !outputBuffer) {
+    if (!hfKey) {
+      apiWarning = 'No HuggingFace token configured; used Local Studio Compositor.';
+      chosen = 'local';
+    } else {
+      try {
+        outputBuffer = await generateWithHuggingFaceCutout({ normBuffer, preset, apiKey: hfKey });
+        engineUsed = 'huggingface-rmbg-studio';
+        estimatedCostInr = 0;
+      } catch (err) {
+        apiWarning = `HuggingFace fallback (${err.message}); used Local Studio Compositor.`;
         chosen = 'local';
       }
     }
@@ -260,3 +327,4 @@ module.exports = {
   applyWatermark,
   normalizeInputPng
 };
+
