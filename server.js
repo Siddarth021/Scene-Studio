@@ -364,6 +364,14 @@ app.get('/api/showcase/:id', async (req, res) => {
       product: 'Vintage Leather Chronograph',
       price: '₹2,499',
       handle: '@aethelwatches'
+    },
+    'theumbrellastore': {
+      sample: 'theumbrellastore',
+      preset: 'sunlight_lifestyle',
+      brand: 'The Umbrella Store',
+      product: 'Morning Brew Scented Soy Candle',
+      price: '₹399',
+      handle: '@theumbrellastore.in'
     }
   };
 

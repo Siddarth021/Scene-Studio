@@ -164,13 +164,34 @@ const DEMO_PRODUCTS = {
     presetId: 'dark_moody',
     beforeFile: 'watch-before.jpg',
     afterFile: 'watch-after.jpg'
+  },
+  theumbrellastore: {
+    id: 'theumbrellastore',
+    title: 'THE UMBRELLA STORE',
+    name: 'Morning Brew Scented Soy Candle',
+    brand: 'The Umbrella Store',
+    price: '₹399',
+    presetId: 'sunlight_lifestyle',
+    beforeFile: 'umbrellastore-before.jpg',
+    afterFile: 'umbrellastore-after.png'
   }
 };
 
 async function createDemoProductBuffer(sampleKey = 'serum') {
   const normalizedKey = (sampleKey || 'serum').toLowerCase().trim();
-  const key = DEMO_PRODUCTS[normalizedKey] ? normalizedKey : (normalizedKey === 'kundan' ? 'jewelry' : 'serum');
+  const item = DEMO_PRODUCTS[normalizedKey] || DEMO_PRODUCTS[normalizedKey === 'kundan' ? 'jewelry' : 'serum'];
+  const key = item ? item.id : 'serum';
   
+  if (item && item.beforeFile) {
+    const customPath = path.join(__dirname, '..', 'public', 'demo', item.beforeFile);
+    if (fs.existsSync(customPath)) {
+      return sharp(customPath)
+        .resize(900, 900, { fit: 'cover' })
+        .png()
+        .toBuffer();
+    }
+  }
+
   const pngPath = path.join(__dirname, '..', 'public', 'demo', `${key}-before.png`);
   if (fs.existsSync(pngPath)) {
     return sharp(pngPath)
@@ -192,8 +213,19 @@ async function createDemoProductBuffer(sampleKey = 'serum') {
 
 async function getDemoAfterBuffer(sampleKey = 'serum') {
   const normalizedKey = (sampleKey || 'serum').toLowerCase().trim();
-  const key = DEMO_PRODUCTS[normalizedKey] ? normalizedKey : (normalizedKey === 'kundan' ? 'jewelry' : 'serum');
+  const item = DEMO_PRODUCTS[normalizedKey] || DEMO_PRODUCTS[normalizedKey === 'kundan' ? 'jewelry' : 'serum'];
+  const key = item ? item.id : 'serum';
   
+  if (item && item.afterFile) {
+    const customPath = path.join(__dirname, '..', 'public', 'demo', item.afterFile);
+    if (fs.existsSync(customPath)) {
+      return sharp(customPath)
+        .resize(1024, 1024, { fit: 'cover' })
+        .png()
+        .toBuffer();
+    }
+  }
+
   const pngPath = path.join(__dirname, '..', 'public', 'demo', `${key}-after.png`);
   if (fs.existsSync(pngPath)) {
     return sharp(pngPath)

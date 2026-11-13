@@ -38,5 +38,15 @@
     "presetId": "dark_moody",
     "before": "/demo/watch-before.jpg",
     "after": "/demo/watch-after.jpg"
+  },
+  "theumbrellastore": {
+    "id": "theumbrellastore",
+    "title": "THE UMBRELLA STORE",
+    "name": "Morning Brew Scented Soy Candle",
+    "brand": "The Umbrella Store",
+    "price": "₹399",
+    "presetId": "sunlight_lifestyle",
+    "before": "/demo/umbrellastore-before.jpg",
+    "after": "/demo/umbrellastore-after.png"
   }
 }
