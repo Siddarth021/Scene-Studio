@@ -48,5 +48,15 @@
     "presetId": "sunlight_lifestyle",
     "before": "/demo/umbrellastore-before.jpg",
     "after": "/demo/umbrellastore-after.png"
+  },
+  "bongoniketan": {
+    "id": "bongoniketan",
+    "title": "BONGONIKETAN",
+    "name": "Handwoven Royal Mulberry Silk Saree",
+    "brand": "Bongoniketan",
+    "price": "₹4,140",
+    "presetId": "festive_indian",
+    "before": "/demo/bongoniketan-before.jpg",
+    "after": "/demo/bongoniketan-after.png"
   }
 }

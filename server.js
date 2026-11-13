@@ -372,6 +372,14 @@ app.get('/api/showcase/:id', async (req, res) => {
       product: 'Morning Brew Scented Soy Candle',
       price: '₹399',
       handle: '@theumbrellastore.in'
+    },
+    'bongoniketan': {
+      sample: 'bongoniketan',
+      preset: 'festive_indian',
+      brand: 'Bongoniketan',
+      product: 'Handwoven Royal Mulberry Silk Saree',
+      price: '₹4,140',
+      handle: '@bongoniketan'
     }
   };
 
