@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SnapStudio — Turn Ugly Phone Photos Into Studio Shots &amp; Ad Packs</title>
-  <meta name="description" content="Upload 1 raw product photo and generate luxury studio scenes, virtual try-on model shots, and Instagram Story ad packs in 30 seconds." />
+  <title>SnapStudio — Turn Raw Phone Photos Into Studio Shots &amp; Ad Packs</title>
+  <meta name="description" content="Upload 1 raw product photo and generate luxury studio scenes, virtual try-on model shots, and 4-format Instagram & marketplace ad packs in 30 seconds." />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <!-- Navigation Bar -->
   <nav class="nav">
     <div class="container nav-inner">
       <a class="logo" href="/">
@@ -17,49 +18,143 @@
       <div class="nav-links">
         <a class="nav-pill active" href="/">AI Product Studio</a>
         <a class="nav-pill" href="/studio">Founder Studio &amp; DM Engine</a>
+        <span class="live-pill">
+          <span class="live-pulse"></span>
+          AI Engine v2.0 Live
+        </span>
       </div>
     </div>
   </nav>
 
   <main class="container">
+    <!-- Hero Section -->
     <section class="hero">
-      <div class="eyebrow">E-Commerce Scene Studio • AI Model Try-On • Seller Ad-Pack</div>
+      <div class="eyebrow">
+        <span>✨</span> AI Commercial Scene Studio • Virtual Model Try-On • 4-Asset Ad-Pack
+      </div>
       <h1>Turn Any Phone Photo Into Studio Shots &amp; Ready-to-Post Ads</h1>
       <p class="lead">
-        Built for Instagram boutiques, Meesho, Amazon, Etsy &amp; D2C sellers. Upload 1 raw snapshot, pick a studio scene or AI model look, and download listing + Instagram Story ads in seconds.
+        Built for Instagram boutiques, Meesho, Amazon, Etsy &amp; D2C sellers. Upload 1 raw snapshot, pick a luxury studio scene or AI model look, and download high-converting Instagram Story &amp; marketplace ad packs in seconds.
       </p>
+
+      <!-- Key Metrics Strip -->
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <span class="metric-icon">⚡</span>
+          <span><strong>30-Second</strong> Instant Render</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-icon">💎</span>
+          <span><strong>₹0 – ₹15</strong> vs ₹15,000 Studio Shoots</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-icon">📱</span>
+          <span><strong>4 Formats</strong> 1:1 Feed, 9:16 Story, White, DM Card</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-icon">🛍️</span>
+          <span><strong>1,400+</strong> Brands &amp; Boutiques Powered</span>
+        </div>
+      </div>
     </section>
 
-    <section class="card">
+    <!-- Interactive Live Demo Section (Instant Before / After Visual Showcase) -->
+    <section class="demo-showcase-section" id="demoSection">
+      <div class="text-center mb-16">
+        <span class="badge badge-neutral" style="margin-bottom:8px;">INTERACTIVE DEMO GALLERY</span>
+        <h2 style="margin:0;font-size:28px;letter-spacing:-0.025em;color:var(--ink);">
+          See The Magic: Real Phone Snapshots Transformed
+        </h2>
+        <p class="small muted" style="margin:6px auto 0;max-width:600px;">
+          Select a sample below and drag the slider to see how raw smartphone photos turn into luxury studio campaigns.
+        </p>
+      </div>
+
+      <!-- Demo Category Selector Tabs -->
+      <div class="demo-nav-strip" id="heroDemoTabs">
+        <button type="button" class="demo-chip active" data-sample="jewelry" data-name="Royal Kundan Choker" data-price="₹1,499" data-preset="marble_luxury">
+          <span>💎</span> Kundan Jewelry
+        </button>
+        <button type="button" class="demo-chip" data-sample="serum" data-name="Saffron Glow Serum" data-price="₹699" data-preset="marble_luxury">
+          <span>🧴</span> Glow Serum
+        </button>
+        <button type="button" class="demo-chip" data-sample="candle" data-name="Vanilla Soy Candle" data-price="₹499" data-preset="sunlight_lifestyle">
+          <span>🕯️</span> Scented Candle
+        </button>
+        <button type="button" class="demo-chip" data-sample="watch" data-name="Vintage Leather Chronograph" data-price="₹2,499" data-preset="dark_moody">
+          <span>⌚</span> Leather Watch
+        </button>
+      </div>
+
+      <!-- Hero Live Interactive Showcase Box -->
+      <div class="demo-preview-card" id="heroDemoBox">
+        <div id="heroDemoContent">
+          <!-- Populated dynamically by app.js on load -->
+          <div style="text-align:center;padding:40px;color:var(--muted);font-weight:600;">
+            Loading interactive studio preview...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Generator Section (Upload + Preset Customizer) -->
+    <section class="card" id="generatorSection">
+      <div class="card-header">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h2 style="margin:0;font-size:22px;letter-spacing:-0.02em;">Create Your Product Studio &amp; Ad Pack</h2>
+            <p class="small muted" style="margin:2px 0 0;">Upload any raw phone snapshot or select a demo item to test the compositor.</p>
+          </div>
+          <span id="engineBadge" class="badge badge-neutral">Engine: Checking...</span>
+        </div>
+      </div>
+
       <form id="genForm">
         <div class="split-2">
-          <!-- Left: Image Upload + Demo Samples + Credit Unlock -->
+          <!-- Left Column: Upload Raw Photo + Demos + Credit Unlock -->
           <div>
-            <label class="field-label">1. Upload Raw Product Photo (or Click a Demo Item)</label>
+            <label class="field-label">1. Upload Raw Product Photo (or Select Demo)</label>
             <div class="dropzone" id="dropzone">
               <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" style="display:none;" />
-              <div style="font-weight:700;">Click to Upload Phone Photo (JPG / PNG / WebP)</div>
-              <div class="small muted">Max 10 MB • Or try a built-in demo product below</div>
+              <div class="dropzone-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+              </div>
+              <div style="font-weight:800;font-size:15px;color:var(--ink);">Click or Drag &amp; Drop Phone Photo</div>
+              <div class="small muted" style="margin-top:4px;">JPG, PNG, or WebP up to 10 MB</div>
               <img id="previewThumb" class="thumb" style="display:none;" alt="Uploaded product preview" />
             </div>
 
-            <div class="input-row mt-12">
-              <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="serum" data-name="Saffron Glow Serum" data-price="₹699">Demo: Glow Serum</button>
-              <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="jewelry" data-name="Royal Kundan Choker" data-price="₹1,499">Demo: Kundan Jewelry</button>
-              <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="candle" data-name="Vanilla Soy Candle" data-price="₹499">Demo: Soy Candle</button>
+            <!-- Built-in Demo Items Quick Select -->
+            <div class="mt-16">
+              <label class="field-label">Or Test with Built-in Demo Items</label>
+              <div class="input-row">
+                <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="jewelry" data-name="Royal Kundan Choker" data-price="₹1,499" data-preset="marble_luxury">
+                  💎 Kundan Jewelry
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="serum" data-name="Saffron Glow Serum" data-price="₹699" data-preset="marble_luxury">
+                  🧴 Glow Serum
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="candle" data-name="Vanilla Soy Candle" data-price="₹499" data-preset="sunlight_lifestyle">
+                  🕯️ Soy Candle
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary demo-btn" data-sample="watch" data-name="Vintage Leather Chronograph" data-price="₹2,499" data-preset="dark_moody">
+                  ⌚ Leather Watch
+                </button>
+              </div>
             </div>
 
-            <div class="mt-16">
-              <label class="field-label" for="creditCodeInput">Have a Pack Credit Code? (Optional — Unlocks Unwatermarked HD)</label>
+            <!-- Pack Credit Code Entry -->
+            <div class="mt-24" style="background:var(--surface-2);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border);">
+              <label class="field-label" for="creditCodeInput">Have a Pack Credit Code? (Unlocks Unwatermarked HD)</label>
               <div class="input-row">
-                <input id="creditCodeInput" type="text" placeholder="e.g. SNAP-A8F2-20" style="flex:1;" />
+                <input id="creditCodeInput" type="text" placeholder="e.g. SNAP-A8F2-20" style="flex:1;background:#fff;" />
                 <button type="button" id="checkCreditBtn" class="btn btn-secondary">Verify Code</button>
               </div>
-              <div id="creditMsg" class="small muted mt-12"></div>
+              <div id="creditMsg" class="small muted mt-8"></div>
             </div>
           </div>
 
-          <!-- Right: Workflow Mode + Preset + Seller Ad-Pack Details -->
+          <!-- Right Column: Workflow Mode + Preset + Ad-Pack Details -->
           <div>
             <label class="field-label">2. Choose Workflow &amp; Style Preset</label>
             <div class="tabs" id="modeTabs">
@@ -72,19 +167,19 @@
             <div class="form-grid mt-16">
               <div>
                 <label class="field-label" for="brandInput">Brand Name (For Ad Pack)</label>
-                <input id="brandInput" type="text" placeholder="Noor Essentials" />
+                <input id="brandInput" type="text" value="Royal Heritage" placeholder="Brand Name" />
               </div>
               <div>
                 <label class="field-label" for="productInput">Product Title</label>
-                <input id="productInput" type="text" placeholder="Saffron Glow Serum" />
+                <input id="productInput" type="text" value="Royal Kundan Choker" placeholder="Product Title" />
               </div>
               <div>
                 <label class="field-label" for="priceInput">Price Tag</label>
-                <input id="priceInput" type="text" value="₹499" placeholder="₹499 or $24" />
+                <input id="priceInput" type="text" value="₹1,499" placeholder="₹1,499 or $49" />
               </div>
               <div>
                 <label class="field-label" for="badgeInput">Offer Ribbon</label>
-                <input id="badgeInput" type="text" value="20% OFF" placeholder="20% OFF" />
+                <input id="badgeInput" type="text" value="FESTIVE SPECIAL" placeholder="20% OFF or NEW DROP" />
               </div>
             </div>
 
@@ -95,13 +190,14 @@
               </div>
               <div>
                 <label class="field-label" for="promptInput">Custom Styling Note (Optional)</label>
-                <input id="promptInput" type="text" placeholder="e.g. add rose petals, warm evening light" />
+                <input id="promptInput" type="text" placeholder="e.g. warm morning sunlight, marble surface" />
               </div>
             </div>
 
-            <div class="mt-16" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-              <button id="generateBtn" class="btn btn-primary" type="submit" style="flex:1 1 240px;">Generate Studio + Ad Pack →</button>
-              <span id="engineBadge" class="badge badge-neutral">Engine: Checking...</span>
+            <div class="mt-24" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+              <button id="generateBtn" class="btn btn-primary btn-lg" type="submit" style="flex:1 1 260px;">
+                <span>✨</span> Generate Studio + Ad Pack →
+              </button>
             </div>
           </div>
         </div>
@@ -109,11 +205,80 @@
       <div id="genStatus" class="status-banner"></div>
     </section>
 
+    <!-- Result Showcase Container (Rendered dynamically) -->
     <section id="resultContainer"></section>
+
+    <!-- Comparison & Value Proposition Section -->
+    <section class="card mt-32" style="background:#ffffff;">
+      <div class="text-center mb-16">
+        <span class="badge badge-neutral" style="margin-bottom:8px;">WHY TOP SELLERS CHOOSE SNAPSTUDIO</span>
+        <h2 style="margin:0;font-size:26px;letter-spacing:-0.025em;color:var(--ink);">
+          Traditional Commercial Shoots vs. SnapStudio AI
+        </h2>
+        <p class="small muted" style="margin:6px auto 0;max-width:580px;">
+          Stop paying thousands for physical studio rentals, photographers, and days of editing delay.
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Traditional Studio Shoot</th>
+              <th>SnapStudio AI Studio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cost Per Product</strong></td>
+              <td class="muted">₹15,000 – ₹40,000 (Photographer + Studio + Retouching)</td>
+              <td><span class="badge badge-pass">₹0 – ₹15 / photo</span></td>
+            </tr>
+            <tr>
+              <td><strong>Turnaround Speed</strong></td>
+              <td class="muted">5 to 7 business days waiting for delivery</td>
+              <td><span class="badge badge-pass">30 seconds instant</span></td>
+            </tr>
+            <tr>
+              <td><strong>Logistics &amp; Samples</strong></td>
+              <td class="muted">Ship fragile physical items to photographer studio</td>
+              <td><span class="badge badge-pass">1 raw phone photo from your desk</span></td>
+            </tr>
+            <tr>
+              <td><strong>Ad Deliverables</strong></td>
+              <td class="muted">Raw unformatted JPEGs needing manual graphic design</td>
+              <td><span class="badge badge-pass">Complete 4-format Ad Pack (Feed, Story, White, Card)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Cold-DM Outreach</strong></td>
+              <td class="muted">None — write your own pitches</td>
+              <td><span class="badge badge-pass">Personalized 1-click Instagram &amp; WhatsApp pitch scripts</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
+
+  <!-- Modern SaaS Footer -->
+  <footer style="margin-top:60px;padding:36px 0;border-top:1px solid var(--border);background:#ffffff;">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="logo-badge" style="width:28px;height:28px;font-size:14px;">S</span>
+        <strong style="font-size:15px;color:var(--ink);">SnapStudio</strong>
+        <span class="muted small" style="margin-left:8px;">© 2026 SnapStudio Technologies. All rights reserved.</span>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;" class="small">
+        <a href="/" class="muted">Studio Home</a>
+        <a href="/studio" class="muted">Founder Engine</a>
+        <a href="#demoSection" class="muted">Live Demos</a>
+        <a href="#generatorSection" class="muted">Generate Now</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="/renderShowcase.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
-

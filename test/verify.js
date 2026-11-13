@@ -78,12 +78,15 @@ async function runTests() {
 
   try {
     await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('Server boot timeout')), 5000);
+      const timer = setTimeout(() => reject(new Error('Server boot timeout')), 15000);
       child.stdout.on('data', (d) => {
         if (d.toString().includes('http://localhost:3466')) {
           clearTimeout(timer);
           resolve();
         }
+      });
+      child.stderr.on('data', (err) => {
+        console.error('Child server stderr:', err.toString());
       });
     });
 

@@ -4,9 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Before &amp; After Product Showcase — SnapStudio</title>
+  <meta name="description" content="Interactive Before & After studio transformation and ready-to-post ad pack. Drag the slider to compare raw snapshot with luxury studio lighting." />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <!-- Navigation Bar -->
   <nav class="nav">
     <div class="container nav-inner">
       <a class="logo" href="/">
@@ -14,18 +16,37 @@
         <span id="navBrand">SnapStudio</span>
       </a>
       <div class="nav-links">
-        <a class="nav-pill" href="/">Try With Another Photo</a>
+        <span class="badge" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;">PROSPECT SHOWCASE</span>
+        <a class="btn btn-sm btn-primary" href="/">Try With Your Own Photo →</a>
       </div>
     </div>
   </nav>
 
   <main class="container">
-    <div id="showcaseStatus" class="status-banner info" style="margin-top:24px;">Loading your studio preview...</div>
+    <div id="showcaseStatus" class="status-banner info" style="margin-top:24px;">
+      <span>⏳</span> Loading interactive studio transformation and ad pack...
+    </div>
+
+    <!-- Main Showcase Injection Container -->
     <section id="showcaseContainer"></section>
   </main>
+
+  <!-- Modern SaaS Footer -->
+  <footer style="margin-top:60px;padding:32px 0;border-top:1px solid var(--border);background:#ffffff;">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="logo-badge" style="width:26px;height:26px;font-size:13px;">S</span>
+        <strong style="font-size:14px;color:var(--ink);">SnapStudio AI</strong>
+        <span class="muted small" style="margin-left:6px;">High-converting commercial product photography in 30 seconds.</span>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;" class="small">
+        <a href="/" class="muted">Try Free</a>
+        <a href="/studio" class="muted">Founder Studio</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="/renderShowcase.js"></script>
   <script src="/showcase.js"></script>
 </body>
 </html>
-

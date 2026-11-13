@@ -5,7 +5,14 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const storage = require('./src/storage');
-const { SCENE_PRESETS, TRYON_PRESETS, getPresetById, createDemoProductBuffer } = require('./src/presets');
+const {
+  SCENE_PRESETS,
+  TRYON_PRESETS,
+  getPresetById,
+  createDemoProductBuffer,
+  getDemoAfterBuffer,
+  DEMO_PRODUCTS
+} = require('./src/presets');
 const { generateStudioImage } = require('./src/imageEngine');
 const { renderAdPack } = require('./src/adPackRenderer');
 const { generateSellerDmScripts, getLaunchTemplates, createUpiPayQr } = require('./src/outreach');
@@ -235,7 +242,8 @@ app.get('/api/public-config', async (req, res) => {
       presets: {
         scene: SCENE_PRESETS,
         tryon: TRYON_PRESETS
-      }
+      },
+      demoProducts: DEMO_PRODUCTS
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -285,13 +293,18 @@ app.post('/api/generate', (req, res) => {
       }
 
       let rawBuffer = req.file?.buffer || null;
+      let afterBuffer = null;
       if (!rawBuffer) {
         const sampleKey = body.demoSample || 'serum';
         rawBuffer = await createDemoProductBuffer(sampleKey);
+        if (!body.customPrompt && (!body.engine || body.engine === 'auto' || body.engine === 'local')) {
+          afterBuffer = await getDemoAfterBuffer(sampleKey);
+        }
       }
 
       const showcase = await executeStudioPipeline({
         rawBuffer,
+        afterBuffer,
         presetId: body.presetId || 'marble_luxury',
         customPrompt: body.customPrompt || '',
         enginePreference: body.engine || '',
@@ -324,8 +337,8 @@ app.get('/api/showcase/:id', async (req, res) => {
       sample: 'jewelry',
       preset: 'marble_luxury',
       brand: 'Eclaypse Handmade Jewelry',
-      product: 'Handcrafted Heritage Pendant',
-      price: '₹799',
+      product: 'Royal Kundan Choker Set',
+      price: '₹1,499',
       handle: '@eclaypse'
     },
     'demo-serum': {
@@ -333,16 +346,24 @@ app.get('/api/showcase/:id', async (req, res) => {
       preset: 'marble_luxury',
       brand: 'Noor Essentials',
       product: 'Saffron Glow Serum',
-      price: '₹499',
+      price: '₹699',
       handle: ''
     },
     'demo-candle': {
       sample: 'candle',
       preset: 'sunlight_lifestyle',
       brand: 'Botanica Aromas',
-      product: 'Soy Wax Vanilla Candle',
-      price: '₹599',
+      product: 'Vanilla Soy Scented Candle',
+      price: '₹499',
       handle: ''
+    },
+    'demo-watch': {
+      sample: 'watch',
+      preset: 'dark_moody',
+      brand: 'Aethel Chrono',
+      product: 'Vintage Leather Chronograph',
+      price: '₹2,499',
+      handle: '@aethelwatches'
     }
   };
 
@@ -350,8 +371,10 @@ app.get('/api/showcase/:id', async (req, res) => {
     try {
       const d = DEMO_MAP[req.params.id];
       const rawBuffer = await createDemoProductBuffer(d.sample);
+      const afterBuffer = await getDemoAfterBuffer(d.sample);
       showcase = await executeStudioPipeline({
         rawBuffer,
+        afterBuffer,
         presetId: d.preset,
         brandName: d.brand,
         productName: d.product,
@@ -488,8 +511,12 @@ app.post('/api/studio/generate-sample', requireStudioAuth, (req, res) => {
       const body = req.body || {};
       const rawFileObj = req.files?.image?.[0];
       const afterFileObj = req.files?.afterImage?.[0];
-      const rawBuffer = rawFileObj?.buffer || (await createDemoProductBuffer(body.demoSample || 'jewelry'));
-      const afterBuffer = afterFileObj?.buffer || null;
+      const sampleKey = body.demoSample || 'jewelry';
+      const rawBuffer = rawFileObj?.buffer || (await createDemoProductBuffer(sampleKey));
+      let afterBuffer = afterFileObj?.buffer || null;
+      if (!afterBuffer && !rawFileObj && (!body.engine || body.engine === 'auto' || body.engine === 'local') && !body.customPrompt) {
+        afterBuffer = await getDemoAfterBuffer(sampleKey);
+      }
       const showcase = await executeStudioPipeline({
         rawBuffer,
         afterBuffer,

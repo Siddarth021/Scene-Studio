@@ -2,9 +2,12 @@
   let presets = { scene: [], tryon: [] };
   let activeMode = 'scene';
   let selectedPresetId = 'marble_luxury';
-  let demoSample = 'serum';
+  let demoSample = 'jewelry';
   let selectedFile = null;
   let publicOffer = null;
+
+  // Cached demo showcase data
+  const demoShowcaseCache = {};
 
   const form = document.getElementById('genForm');
   const dropzone = document.getElementById('dropzone');
@@ -16,15 +19,18 @@
   const generateBtn = document.getElementById('generateBtn');
   const creditCodeInput = document.getElementById('creditCodeInput');
   const creditMsg = document.getElementById('creditMsg');
+  const heroDemoContent = document.getElementById('heroDemoContent');
 
   function setStatus(type, msg) {
     if (!msg) {
       statusEl.className = 'status-banner';
       statusEl.textContent = '';
+      statusEl.style.display = 'none';
       return;
     }
     statusEl.className = `status-banner ${type}`;
-    statusEl.textContent = msg;
+    statusEl.innerHTML = `<span>${type === 'error' ? '⚠️' : type === 'success' ? '✓' : 'ℹ️'}</span> <span>${window.SnapStudioView ? window.SnapStudioView.esc(msg) : msg}</span>`;
+    statusEl.style.display = 'flex';
   }
 
   function renderPresets() {
@@ -37,13 +43,101 @@
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'preset-card' + (p.id === selectedPresetId ? ' selected' : '');
-      btn.innerHTML = `<div class="preset-title">${window.SnapStudioView.esc(p.name)}</div><div class="preset-tag">${window.SnapStudioView.esc(p.tag)}</div>`;
+      const esc = window.SnapStudioView ? window.SnapStudioView.esc : (s) => s;
+      btn.innerHTML = `
+        <div class="preset-title">
+          <span>${esc(p.name)}</span>
+          ${p.id === selectedPresetId ? '<span style="color:var(--accent);font-size:12px;">✓</span>' : ''}
+        </div>
+        <div class="preset-tag">${esc(p.tag)}</div>
+      `;
       btn.addEventListener('click', () => {
         selectedPresetId = p.id;
         renderPresets();
       });
       presetGrid.appendChild(btn);
     }
+  }
+
+  // Load and render interactive demo showcase in Hero section
+  async function loadHeroDemo(sampleKey) {
+    if (!heroDemoContent) return;
+
+    const demoMap = {
+      jewelry: { id: 'demo-jewelry', name: 'Royal Kundan Choker', brand: 'Eclaypse Handmade Jewelry', price: '₹1,499', preset: 'marble_luxury' },
+      serum: { id: 'demo-serum', name: 'Saffron Glow Serum', brand: 'Noor Essentials', price: '₹699', preset: 'marble_luxury' },
+      candle: { id: 'demo-candle', name: 'Vanilla Soy Candle', brand: 'Botanica Aromas', price: '₹499', preset: 'sunlight_lifestyle' },
+      watch: { id: 'demo-watch', name: 'Vintage Leather Chronograph', brand: 'Aethel Chrono', price: '₹2,499', preset: 'dark_moody' }
+    };
+
+    const d = demoMap[sampleKey] || demoMap.jewelry;
+
+    try {
+      if (!demoShowcaseCache[d.id]) {
+        heroDemoContent.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);"><span class="live-pulse" style="display:inline-block;margin-right:8px;"></span> Loading interactive ${d.name} studio showcase...</div>`;
+        const res = await fetch(`/api/showcase/${encodeURIComponent(d.id)}`);
+        if (res.ok) {
+          const data = await res.json();
+          demoShowcaseCache[d.id] = data;
+        }
+      }
+
+      const cached = demoShowcaseCache[d.id];
+      if (cached && window.SnapStudioView) {
+        window.SnapStudioView.renderShowcase(heroDemoContent, {
+          showcase: cached.showcase,
+          offer: cached.offer || publicOffer,
+          showcaseUrl: `${window.location.origin}/showcase/${d.id}`,
+          isPublicShowcase: false
+        });
+
+        // Add "Use This Product in Generator" action banner at the top of demo
+        const heroCard = heroDemoContent.querySelector('.card');
+        if (heroCard) {
+          const ctaBanner = document.createElement('div');
+          ctaBanner.style.cssText = 'background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:12px;padding:10px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;';
+          ctaBanner.innerHTML = `
+            <div class="small" style="color:var(--accent);font-weight:700;">
+              💡 Love this result? Try generating your own version with this demo product:
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" id="btnUseDemoInGen">
+              Load Into Studio Generator ↓
+            </button>
+          `;
+          heroCard.insertBefore(ctaBanner, heroCard.firstChild);
+
+          const useBtn = ctaBanner.querySelector('#btnUseDemoInGen');
+          if (useBtn) {
+            useBtn.addEventListener('click', () => {
+              applyDemoProduct(sampleKey, d.name, d.price, d.brand, d.preset);
+              const genSec = document.getElementById('generatorSection');
+              if (genSec) genSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error loading hero demo:', err);
+    }
+  }
+
+  function applyDemoProduct(sampleKey, name, price, brand = '', preset = '') {
+    selectedFile = null;
+    imageInput.value = '';
+    demoSample = sampleKey;
+    previewThumb.src = `/demo/${sampleKey}-before.jpg`;
+    previewThumb.style.display = 'inline-block';
+
+    if (name) document.getElementById('productInput').value = name;
+    if (price) document.getElementById('priceInput').value = price;
+    if (brand) document.getElementById('brandInput').value = brand;
+
+    if (preset) {
+      selectedPresetId = preset;
+      renderPresets();
+    }
+
+    setStatus('info', `Selected demo product: "${name}". Customize details and click "Generate Studio + Ad Pack" below!`);
   }
 
   async function init() {
@@ -57,54 +151,92 @@
       }
       const eng = publicOffer?.engines || {};
       const pref = eng.defaultEngine || 'auto';
-      let activeEngine = 'Local Studio Compositor (Add API key in /studio for AI)';
+      let activeEngine = 'Local Studio Compositor (₹0 Cost)';
       if (pref === 'fal' && eng.falReady) {
-        activeEngine = 'Fal.ai Product Shot Ready';
-      } else if (pref === 'huggingface' && eng.hfReady) {
-        activeEngine = 'HuggingFace Free Cutout Ready';
+        activeEngine = 'Fal.ai Photorealistic Studio';
       } else if (pref === 'gemini' && eng.geminiReady) {
-        activeEngine = 'Gemini 2.5 Flash Image Ready';
-      } else if (pref === 'local') {
-        activeEngine = 'Local Studio Compositor (₹0)';
+        activeEngine = 'Gemini 2.5 Flash Engine';
+      } else if (pref === 'huggingface' && eng.hfReady) {
+        activeEngine = 'HuggingFace Studio Ready';
       } else if (eng.geminiReady) {
-        activeEngine = 'Gemini 2.5 Flash Image Ready';
+        activeEngine = 'Gemini 2.5 Flash Engine';
       } else if (eng.falReady) {
-        activeEngine = 'Fal.ai Product Shot Ready';
-      } else if (eng.hfReady) {
-        activeEngine = 'HuggingFace Free Cutout Ready';
+        activeEngine = 'Fal.ai Photorealistic Studio';
       }
       document.getElementById('engineBadge').textContent = activeEngine;
       renderPresets();
-    } catch {
-      // ignore
+
+      // Load initial hero demo
+      loadHeroDemo('jewelry');
+    } catch (err) {
+      console.warn('Config init error:', err);
     }
   }
 
+  // Hero Demo Category Switcher
+  document.querySelectorAll('#heroDemoTabs .demo-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#heroDemoTabs .demo-chip').forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      const sample = chip.dataset.sample;
+      loadHeroDemo(sample);
+    });
+  });
+
+  // Dropzone Drag & Drop
   dropzone.addEventListener('click', () => imageInput.click());
+  ['dragenter', 'dragover'].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+  });
+  ['dragleave', 'drop'].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+    });
+  });
+  dropzone.addEventListener('drop', (e) => {
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      handleSelectedFile(files[0]);
+    }
+  });
+
   imageInput.addEventListener('change', () => {
     const file = imageInput.files?.[0];
-    if (!file) return;
+    if (file) handleSelectedFile(file);
+  });
+
+  function handleSelectedFile(file) {
+    if (!file.type.match(/^image\/(png|jpe?g|webp)$/i)) {
+      setStatus('error', 'Please upload a valid JPG, PNG, or WebP product image.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setStatus('error', 'File size exceeds 10 MB limit.');
+      return;
+    }
+
     selectedFile = file;
     const reader = new FileReader();
     reader.onload = () => {
       previewThumb.src = reader.result;
       previewThumb.style.display = 'inline-block';
+      setStatus('info', `Photo selected: ${file.name} (${(file.size / 1024).toFixed(0)} KB). Ready to generate!`);
     };
     reader.readAsDataURL(file);
-  });
+  }
 
+  // Demo item buttons in Generator
   document.querySelectorAll('.demo-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      selectedFile = null;
-      imageInput.value = '';
-      previewThumb.style.display = 'none';
-      demoSample = btn.dataset.sample;
-      document.getElementById('productInput').value = btn.dataset.name;
-      document.getElementById('priceInput').value = btn.dataset.price;
-      setStatus('info', `Selected built-in demo photo: ${btn.dataset.name}. Click "Generate Studio + Ad Pack" to preview!`);
+      applyDemoProduct(btn.dataset.sample, btn.dataset.name, btn.dataset.price, '', btn.dataset.preset);
     });
   });
 
+  // Workflow Mode Tabs
   document.querySelectorAll('#modeTabs .tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#modeTabs .tab-btn').forEach((b) => b.classList.remove('active'));
@@ -114,29 +246,39 @@
     });
   });
 
+  // Credit Verification
   document.getElementById('checkCreditBtn').addEventListener('click', async () => {
     const code = creditCodeInput.value.trim();
     if (!code) return;
-    creditMsg.textContent = 'Checking code...';
-    const res = await fetch('/api/credits/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
-    });
-    const data = await res.json();
-    if (res.ok && data.valid) {
-      creditMsg.style.color = '#15803d';
-      creditMsg.textContent = `✓ Active! "${data.label}" — ${data.remainingCredits} of ${data.totalCredits} HD credits remaining.`;
-    } else {
-      creditMsg.style.color = '#dc2626';
-      creditMsg.textContent = data.error || 'Invalid credit code.';
+    creditMsg.textContent = 'Verifying code...';
+    try {
+      const res = await fetch('/api/credits/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+      const data = await res.json();
+      if (res.ok && data.valid) {
+        creditMsg.style.color = 'var(--pass)';
+        creditMsg.textContent = `✓ Active Pack! "${data.label}" — ${data.remainingCredits} of ${data.totalCredits} HD credits remaining.`;
+      } else {
+        creditMsg.style.color = 'var(--danger)';
+        creditMsg.textContent = data.error || 'Invalid credit code.';
+      }
+    } catch {
+      creditMsg.style.color = 'var(--danger)';
+      creditMsg.textContent = 'Verification error.';
     }
   });
 
+  // Form Submit & Generation
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     generateBtn.disabled = true;
-    setStatus('info', 'Generating studio scene, Instagram Feed Ad, 9:16 Story Ad, and Before/After card...');
+    const originalBtnText = generateBtn.innerHTML;
+    generateBtn.innerHTML = '<span>⚡</span> Generating Studio + 4 Ad Formats...';
+
+    setStatus('info', 'Compositing luxury studio scene, 1:1 Feed Ad, 9:16 Story Ad, Pure White listing & Before/After proof card...');
 
     try {
       const fd = new FormData();
@@ -161,7 +303,7 @@
       if (!res.ok) throw new Error(data.error || 'Generation failed.');
 
       if (data.remainingCredits !== null && data.remainingCredits !== undefined) {
-        creditMsg.style.color = '#15803d';
+        creditMsg.style.color = 'var(--pass)';
         creditMsg.textContent = `✓ Unlocked HD render! ${data.remainingCredits} credits remaining.`;
       }
 
@@ -177,9 +319,9 @@
       setStatus('error', err.message || 'Unable to generate images.');
     } finally {
       generateBtn.disabled = false;
+      generateBtn.innerHTML = originalBtnText;
     }
   });
 
   init();
 })();
-

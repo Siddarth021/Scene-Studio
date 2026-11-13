@@ -1,0 +1,42 @@
+{
+  "serum": {
+    "id": "serum",
+    "title": "GLOW DROP",
+    "name": "Saffron Vitamin C Serum",
+    "brand": "Noor Essentials",
+    "price": "₹699",
+    "presetId": "marble_luxury",
+    "before": "/demo/serum-before.jpg",
+    "after": "/demo/serum-after.jpg"
+  },
+  "jewelry": {
+    "id": "jewelry",
+    "title": "ROYAL KUNDAN",
+    "name": "Royal Kundan Choker Set",
+    "brand": "Eclaypse Handmade Jewelry",
+    "price": "₹1,499",
+    "presetId": "marble_luxury",
+    "before": "/demo/jewelry-before.jpg",
+    "after": "/demo/jewelry-after.jpg"
+  },
+  "candle": {
+    "id": "candle",
+    "title": "NOOR STUDIO",
+    "name": "Vanilla Soy Scented Candle",
+    "brand": "Botanica Aromas",
+    "price": "₹499",
+    "presetId": "sunlight_lifestyle",
+    "before": "/demo/candle-before.jpg",
+    "after": "/demo/candle-after.jpg"
+  },
+  "watch": {
+    "id": "watch",
+    "title": "AETHEL CHRONO",
+    "name": "Vintage Leather Chronograph",
+    "brand": "Aethel Chrono",
+    "price": "₹2,499",
+    "presetId": "dark_moody",
+    "before": "/demo/watch-before.jpg",
+    "after": "/demo/watch-after.jpg"
+  }
+}

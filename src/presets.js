@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const sharp = require('sharp');
 
 const SCENE_PRESETS = [
@@ -122,83 +124,102 @@ function getPresetById(id) {
   return ALL_PRESETS.find((p) => p.id === id) || SCENE_PRESETS[0];
 }
 
+const DEMO_PRODUCTS = {
+  serum: {
+    id: 'serum',
+    title: 'GLOW DROP',
+    name: 'Saffron Vitamin C Serum',
+    brand: 'Noor Essentials',
+    price: '₹699',
+    presetId: 'marble_luxury',
+    beforeFile: 'serum-before.jpg',
+    afterFile: 'serum-after.jpg'
+  },
+  jewelry: {
+    id: 'jewelry',
+    title: 'ROYAL KUNDAN',
+    name: 'Royal Kundan Choker Set',
+    brand: 'Eclaypse Handmade Jewelry',
+    price: '₹1,499',
+    presetId: 'marble_luxury',
+    beforeFile: 'jewelry-before.jpg',
+    afterFile: 'jewelry-after.jpg'
+  },
+  candle: {
+    id: 'candle',
+    title: 'NOOR STUDIO',
+    name: 'Vanilla Soy Scented Candle',
+    brand: 'Botanica Aromas',
+    price: '₹499',
+    presetId: 'sunlight_lifestyle',
+    beforeFile: 'candle-before.jpg',
+    afterFile: 'candle-after.jpg'
+  },
+  watch: {
+    id: 'watch',
+    title: 'AETHEL CHRONO',
+    name: 'Vintage Leather Chronograph',
+    brand: 'Aethel Chrono',
+    price: '₹2,499',
+    presetId: 'dark_moody',
+    beforeFile: 'watch-before.jpg',
+    afterFile: 'watch-after.jpg'
+  }
+};
+
 async function createDemoProductBuffer(sampleKey = 'serum') {
-  const configs = {
-    serum: {
-      title: 'GLOW DROP',
-      sub: 'Saffron Vitamin C Serum',
-      bg: '#cbd5e1',
-      cardBg: '#94a3b8',
-      bottle: '#d97706',
-      cap: '#1e293b',
-      label: '#fffbeb'
-    },
-    jewelry: {
-      title: 'ROYAL KUNDAN',
-      sub: 'Handcrafted Choker Set',
-      bg: '#d6d3d1',
-      cardBg: '#a8a29e',
-      bottle: '#ca8a04',
-      cap: '#78350f',
-      label: '#fef9c3'
-    },
-    candle: {
-      title: 'NOOR STUDIO',
-      sub: 'Hand-Poured Soy Candle',
-      bg: '#e2e8f0',
-      cardBg: '#cbd5e1',
-      bottle: '#7c2d12',
-      cap: '#0f172a',
-      label: '#fff7ed'
-    }
-  };
-  const c = configs[sampleKey] || configs.serum;
+  const normalizedKey = (sampleKey || 'serum').toLowerCase().trim();
+  const key = DEMO_PRODUCTS[normalizedKey] ? normalizedKey : (normalizedKey === 'kundan' ? 'jewelry' : 'serum');
+  
+  const pngPath = path.join(__dirname, '..', 'public', 'demo', `${key}-before.png`);
+  if (fs.existsSync(pngPath)) {
+    return sharp(pngPath)
+      .resize(900, 900, { fit: 'cover' })
+      .png()
+      .toBuffer();
+  }
+  
+  const jpgPath = path.join(__dirname, '..', 'public', 'demo', `${key}-before.jpg`);
+  if (fs.existsSync(jpgPath)) {
+    return sharp(jpgPath)
+      .resize(900, 900, { fit: 'cover' })
+      .png()
+      .toBuffer();
+  }
 
-  // Deliberately slightly "raw phone-photo" looking backdrop (flat bedsheet/table tone) so before/after transformation shines
-  const svg = `<svg width="900" height="900" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="rawbg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="${c.bg}"/>
-        <stop offset="100%" stop-color="${c.cardBg}"/>
-      </linearGradient>
-      <filter id="soft"><feDropShadow dx="4" dy="10" stdDeviation="8" flood-opacity="0.22"/></filter>
-    </defs>
-    <rect width="900" height="900" fill="url(#rawbg)"/>
-    <path d="M0,620 Q300,590 600,630 T900,610 L900,900 L0,900 Z" fill="#b8c0cc" opacity="0.55"/>
-    <g filter="url(#soft)" transform="rotate(-2 450 470)">
-      ${
-        sampleKey === 'jewelry'
-          ? `
-            <rect x="270" y="210" width="360" height="460" rx="22" fill="#451a03"/>
-            <path d="M330,300 Q450,480 570,300" fill="none" stroke="#facc15" stroke-width="18" stroke-linecap="round"/>
-            <circle cx="380" cy="368" r="14" fill="#fef08a" stroke="#ca8a04" stroke-width="4"/>
-            <circle cx="450" cy="402" r="20" fill="#fef08a" stroke="#ca8a04" stroke-width="5"/>
-            <circle cx="520" cy="368" r="14" fill="#fef08a" stroke="#ca8a04" stroke-width="4"/>
-            <rect x="330" y="510" width="240" height="82" rx="10" fill="${c.label}"/>
-            <text x="450" y="548" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#78350f" text-anchor="middle">${c.title}</text>
-            <text x="450" y="576" font-family="Arial,sans-serif" font-size="14" fill="#92400e" text-anchor="middle">${c.sub}</text>
-          `
-          : `
-            <rect x="385" y="185" width="130" height="85" rx="14" fill="${c.cap}"/>
-            <rect x="355" y="265" width="190" height="42" rx="12" fill="#334155"/>
-            <rect x="310" y="295" width="280" height="390" rx="34" fill="${c.bottle}"/>
-            <rect x="335" y="365" width="230" height="230" rx="14" fill="${c.label}"/>
-            <text x="450" y="455" font-family="Arial,sans-serif" font-size="26" font-weight="bold" fill="#0f172a" text-anchor="middle">${c.title}</text>
-            <text x="450" y="492" font-family="Arial,sans-serif" font-size="15" fill="#475569" text-anchor="middle">${c.sub}</text>
-            <text x="450" y="545" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#b45309" text-anchor="middle">100% PURE • 30 ML</text>
-          `
-      }
-    </g>
-  </svg>`;
+  throw new Error(`Photorealistic demo asset not found for: ${sampleKey}`);
+}
 
-  return sharp(Buffer.from(svg)).png().toBuffer();
+async function getDemoAfterBuffer(sampleKey = 'serum') {
+  const normalizedKey = (sampleKey || 'serum').toLowerCase().trim();
+  const key = DEMO_PRODUCTS[normalizedKey] ? normalizedKey : (normalizedKey === 'kundan' ? 'jewelry' : 'serum');
+  
+  const pngPath = path.join(__dirname, '..', 'public', 'demo', `${key}-after.png`);
+  if (fs.existsSync(pngPath)) {
+    return sharp(pngPath)
+      .resize(1024, 1024, { fit: 'cover' })
+      .png()
+      .toBuffer();
+  }
+
+  const jpgPath = path.join(__dirname, '..', 'public', 'demo', `${key}-after.jpg`);
+  if (fs.existsSync(jpgPath)) {
+    return sharp(jpgPath)
+      .resize(1024, 1024, { fit: 'cover' })
+      .png()
+      .toBuffer();
+  }
+
+  return null;
 }
 
 module.exports = {
   SCENE_PRESETS,
   TRYON_PRESETS,
   ALL_PRESETS,
+  DEMO_PRODUCTS,
   getPresetById,
-  createDemoProductBuffer
+  createDemoProductBuffer,
+  getDemoAfterBuffer
 };
 
