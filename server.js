@@ -110,7 +110,8 @@ async function executeStudioPipeline({
   sellerHandle = '',
   watermarked = true,
   creditCodeUsed = '',
-  isStudioSample = false
+  isStudioSample = false,
+  customShowcaseId = null
 }) {
   const settings = storage.getSettings();
   const preset = getPresetById(presetId);
@@ -156,6 +157,7 @@ async function executeStudioPipeline({
   const beforeAfterFile = storage.saveAssetBuffer(`ba_${runId}.png`, adPack.beforeAfterCard);
 
   const showcase = storage.saveShowcase({
+    id: customShowcaseId || undefined,
     businessName: brandName || 'Seller Preview',
     productName: productName || 'Product Shot',
     sellerHandle,
@@ -315,7 +317,57 @@ app.post('/api/generate', (req, res) => {
 });
 
 app.get('/api/showcase/:id', async (req, res) => {
-  const showcase = storage.getShowcase(req.params.id, true);
+  let showcase = storage.getShowcase(req.params.id, true);
+
+  const DEMO_MAP = {
+    'demo-jewelry': {
+      sample: 'jewelry',
+      preset: 'marble_luxury',
+      brand: 'Eclaypse Handmade Jewelry',
+      product: 'Handcrafted Heritage Pendant',
+      price: '₹799',
+      handle: '@eclaypse'
+    },
+    'demo-serum': {
+      sample: 'serum',
+      preset: 'marble_luxury',
+      brand: 'Noor Essentials',
+      product: 'Saffron Glow Serum',
+      price: '₹499',
+      handle: ''
+    },
+    'demo-candle': {
+      sample: 'candle',
+      preset: 'sunlight_lifestyle',
+      brand: 'Botanica Aromas',
+      product: 'Soy Wax Vanilla Candle',
+      price: '₹599',
+      handle: ''
+    }
+  };
+
+  if (!showcase && DEMO_MAP[req.params.id]) {
+    try {
+      const d = DEMO_MAP[req.params.id];
+      const rawBuffer = await createDemoProductBuffer(d.sample);
+      showcase = await executeStudioPipeline({
+        rawBuffer,
+        presetId: d.preset,
+        brandName: d.brand,
+        productName: d.product,
+        priceText: d.price,
+        discountBadge: 'STUDIO SAMPLE',
+        ctaText: 'DM TO ORDER ON WHATSAPP',
+        sellerHandle: d.handle,
+        watermarked: false,
+        isStudioSample: true,
+        customShowcaseId: req.params.id
+      });
+    } catch (err) {
+      console.error('Failed to auto-seed demo showcase:', err);
+    }
+  }
+
   if (!showcase) {
     return res.status(404).json({ error: 'Showcase not found.' });
   }

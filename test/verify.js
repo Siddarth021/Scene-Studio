@@ -131,6 +131,11 @@ async function runTests() {
     const showRes = await fetch(`${base}/api/showcase/${paidGen.showcase.id}`).then((r) => r.json());
     assert.strictEqual(showRes.showcase.id, paidGen.showcase.id);
 
+    // Auto-seeded permanent demo showcase verification
+    const demoJewelryRes = await fetch(`${base}/api/showcase/demo-jewelry`).then((r) => r.json());
+    assert.strictEqual(demoJewelryRes.showcase.id, 'demo-jewelry');
+    assert.ok(demoJewelryRes.showcase.businessName.includes('Eclaypse'));
+
     const imgRes = await fetch(`${base}/assets/${paidGen.showcase.adPackFiles.storyAd}`);
     assert.strictEqual(imgRes.status, 200);
     assert.ok((imgRes.headers.get('content-type') || '').includes('image/png'));

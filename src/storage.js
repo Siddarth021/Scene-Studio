@@ -176,14 +176,22 @@ function toggleCredit(id, active) {
 // Showcases
 function saveShowcase(payload) {
   const db = readDb();
+  const cleanPayload = { ...payload };
+  const id = cleanPayload.id || makeId('sh_');
+  delete cleanPayload.id;
+  const existingIdx = db.showcases.findIndex((s) => s.id === id);
   const item = {
-    id: makeId('sh_'),
-    createdAt: new Date().toISOString(),
-    viewCount: 0,
-    unlocked: Boolean(payload.unlocked),
-    ...payload
+    ...cleanPayload,
+    id,
+    createdAt: cleanPayload.createdAt || new Date().toISOString(),
+    viewCount: existingIdx >= 0 ? (db.showcases[existingIdx].viewCount || 0) : 0,
+    unlocked: Boolean(cleanPayload.unlocked)
   };
-  db.showcases.unshift(item);
+  if (existingIdx >= 0) {
+    db.showcases[existingIdx] = item;
+  } else {
+    db.showcases.unshift(item);
+  }
   if (db.showcases.length > 250) db.showcases = db.showcases.slice(0, 250);
   writeDb(db);
   return item;
